@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Links</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ---- Existing CSS unchanged ---- */
+    body {
+      background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.13);
+    }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 10px 22px;
+      background: linear-gradient(90deg, #d7263d 0%, #fbb040 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 2px 8px #d7263d33;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .back-btn:hover {
+      background: linear-gradient(90deg, #fbb040 0%, #d7263d 100%);
+      transform: scale(1.07);
+    }
+    h1 {
+      text-align: center;
+      color: #d7263d;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+      font-family: 'Segoe UI Black', Arial, sans-serif;
+      text-shadow: 2px 2px 0 #fff, 0 2px 8px #d7263d44;
+    }
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .video-card {
+      background: linear-gradient(135deg, #fffbe7 0%, #ffe0e6 100%);
+      border-radius: 14px;
+      box-shadow: 0 6px 24px #d7263d22;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      border: 2px solid #fbb040;
+      margin-bottom: 10px;
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .video-card:hover {
+      transform: scale(1.03) rotate(-1deg);
+      box-shadow: 0 12px 36px #d7263d44;
+      border-color: #d7263d;
+    }
+    .video-quality {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #d7263d;
+      margin-bottom: 8px;
+    }
+    .video-link {
+      color: #fbb040;
+      text-decoration: underline;
+      font-size: 1.05rem;
+      word-break: break-all;
+      margin-bottom: 4px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .video-link:hover {
+      color: #d7263d;
+    }
+    .no-videos {
+      text-align: center;
+      color: #fff;
+      font-size: 1.1rem;
+      margin-top: 40px;
+      text-shadow: 1px 1px 0 #d7263d, 0 2px 8px #d7263d44;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a id="backBtn" href="#" class="back-btn">&#8592; Back to Content</a>
+    <h1>Video Links</h1>
+    <div id="videoList" class="video-list"></div>
+    <div id="noVideos" class="no-videos" style="display:none;">No video links found.</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script>
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('backBtn').onclick = function(e) {
+        e.preventDefault();
+        window.history.back();
+      };
+    });
+
+    // Helper: detect absolute URL
+    function isAbsoluteUrl(u) {
+      try {
+        const parsed = new URL(u);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function decryptLink(enc) {
+      if (!enc) return "";
+      try {
+        const b64 = enc.split(':')[0];
+        const key = CryptoJS.enc.Utf8.parse('638udh3829162018');
+        const iv = CryptoJS.enc.Utf8.parse('fedcba9876543210');
+        const encrypted = CryptoJS.enc.Base64.parse(b64);
+        const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+      } catch (e) {
+        return "";
+      }
+    }
+
+    function resolveUrl(maybeEnc) {
+      if (!maybeEnc) return "";
+      const d = decryptLink(maybeEnc);
+      if (d && isAbsoluteUrl(d)) return d;
+      if (d) return d;
+      if (isAbsoluteUrl(maybeEnc)) return maybeEnc;
+      const t = String(maybeEnc).trim();
+      if (isAbsoluteUrl(t)) return t;
+      return "";
+    }
+
+    function renderVideos(videos) {
+      const videoList = document.getElementById('videoList');
+      videoList.innerHTML = '';
+
+      videos.forEach(video => {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+
+        const quality = document.createElement('div');
+        quality.className = 'video-quality';
+        quality.textContent = video.quality || video.bitrate || "Unknown Quality";
+        card.appendChild(quality);
+
+        function appendLink(label, raw) {
+          const url = resolveUrl(raw);
+          if (!url) return;
+          const a = document.createElement('a');
+          a.href = url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.className = 'video-link';
+          a.textContent = label;
+          card.appendChild(a);
+        }
+
+        appendLink("Main Link", video.path);
+        appendLink("Backup Link 1", video.backup_url);
+        appendLink("Backup Link 2", video.backup_url2);
+
+        videoList.appendChild(card);
+      });
+
+      if (!videoList.hasChildNodes()) {
+        document.getElementById('noVideos').style.display = 'block';
+      } else {
+        document.getElementById('noVideos').style.display = 'none';
+      }
+    }
+
+    async function fetchVideoLinks(videoId, folder_wise_course = 1, ytflag = 0) {
+      try {
+        const courseId = getQueryParam("courseId") || '';
+        const appApiBase = "https://adeswal-eng.onrender.com/api/get/fetchVideoDetailsById";
+        const url = `${appApiBase}?course_id=${encodeURIComponent(courseId)}&video_id=${encodeURIComponent(videoId)}&ytflag=${encodeURIComponent(ytflag)}&folder_wise_course=1&lc_app_api_url=`;
+        console.log("Fetching:", url);
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        console.log("API Response:", json);
+
+        const data = Array.isArray(json.data) ? json.data : [];
+
+        if (json.status === 200 && data.length > 0) {
+          renderVideos(data);
+          document.getElementById('noVideos').style.display = 'none';
+        } else {
+          document.getElementById('noVideos').style.display = 'block';
+          document.getElementById('noVideos').textContent = json.message || "No video links found.";
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('noVideos').textContent = "Failed to load video links.";
+        document.getElementById('noVideos').style.display = 'block';
+      }
+    }
+
+    const videoId = getQueryParam("videoId") || getQueryParam("videoid");
+    const ytflag = getQueryParam("ytflag") || 0;
+    if (videoId) {
+      fetchVideoLinks(videoId, 1, ytflag);
+    } else {
+      document.getElementById('noVideos').textContent = "No video ID provided.";
+      document.getElementById('noVideos').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
