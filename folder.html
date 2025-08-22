@@ -319,7 +319,7 @@
                         return;
                     }
 
-                    // VIDEO
+                    // VIDEO — UPDATED: always redirect to video-links.html with proper params
                     if (item.material_type === 'VIDEO' || item.video_id) {
                         const card = document.createElement('div');
                         card.className = 'file-card';
@@ -335,18 +335,15 @@
                         card.appendChild(name);
 
                         card.onclick = function() {
-                            if (item.video_id) {
-                                const vid = decryptCustom(item.video_id);
-                                if (vid) {
-                                    window.open(`https://www.youtube.com/watch?v=${vid}`, '_blank');
-                                } else {
-                                    showSadPopup("Sorry, we can't fetch this video.");
-                                }
-                            } else {
-                                // Open video-links.html with videoid and folder_wise_course=1
-                                const appId = getQueryParam("app_id");
-                                window.location.href = `video-links.html?app_id=${appId}&videoid=${encodeURIComponent(item.id || item.video_id)}&folder_wise_course=1`;
-                            }
+                            // Build redirect URL to video-links.html (always)
+                            const appId = getQueryParam("app_id") || "";
+                            // Use item.id if present, else fall back to item.video_id
+                            const vidParam = encodeURIComponent(item.id || item.video_id || "");
+                            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
+                            const courseParam = encodeURIComponent(courseId);
+                            let redirectUrl = `video-links.html?courseId=${courseParam}&videoId=${vidParam}&ytflag=${ytflag}&folder_wise_course=1`;
+                            if (appId) redirectUrl += `&app_id=${encodeURIComponent(appId)}`;
+                            window.location.href = redirectUrl;
                         };
 
                         folderList.appendChild(card);
