@@ -1,306 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>RWA by Sunny Ji</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            background: radial-gradient(circle at 60% 40%, #ffb347 0%, #ff5858 60%, #d7263d 100%);
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 24px;
-            background: linear-gradient(135deg, #fffbe7 0%, #ffe0e6 100%);
-            border-radius: 22px;
-            box-shadow: 0 12px 48px 0 #d7263d44;
-            border: 3px solid #d7263d;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #d7263d;
-            font-size: 2.5rem;
-            letter-spacing: 2px;
-            margin-bottom: 18px;
-            font-family: 'Segoe UI Black', Arial, sans-serif;
-            text-shadow: 2px 2px 0 #fff, 0 2px 8px #d7263d44;
-        }
-        
-        .search-bar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 32px;
-            gap: 10px;
-        }
-        
-        .search-input {
-            width: 340px;
-            padding: 12px 16px;
-            font-size: 1.1rem;
-            border: 2px solid #d7263d;
-            border-radius: 10px;
-            outline: none;
-            transition: border 0.2s;
-            box-shadow: 0 2px 8px #d7263d22;
-        }
-        
-        .search-input:focus {
-            border-color: #fbb040;
-            background: #fffbe7;
-        }
-        
-        .search-clear {
-            background: linear-gradient(90deg, #fbb040 0%, #d7263d 100%);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 1.05rem;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 2px 8px #d7263d33;
-            transition: background 0.2s, transform 0.15s;
-        }
-        
-        .search-clear:hover {
-            background: linear-gradient(90deg, #d7263d 0%, #fbb040 100%);
-            transform: scale(1.07);
-        }
-        
-        .course-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 32px;
-            justify-content: center;
-        }
-        
-        .course-card {
-            background: linear-gradient(135deg, #fbb040 0%, #ff5858 100%);
-            border-radius: 22px;
-            box-shadow: 0 8px 32px #d7263d22;
-            width: 340px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.22s, box-shadow 0.22s;
-            border: 2px solid #fffbe7;
-            position: relative;
-        }
-        
-        .course-card:hover {
-            transform: translateY(-8px) scale(1.04) rotate(-1deg);
-            box-shadow: 0 16px 48px #d7263d44;
-            border-color: #d7263d;
-        }
-        
-        .course-thumb {
-            width: 100%;
-            height: 220px;
-            object-fit: contain;
-            background: #fff;
-            border-bottom: 2px solid #fbb040;
-            display: block;
-            margin: 0 auto;
-        }
-        
-        .course-content {
-            padding: 22px 22px 18px 22px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .course-title {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #d7263d;
-            margin: 0 0 4px 0;
-            letter-spacing: 1px;
-        }
-        
-        .course-exam {
-            font-size: 1.05rem;
-            color: #fbb040;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .course-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 0.99rem;
-            color: #b23c3c;
-            margin-bottom: 8px;
-        }
-        
-        .no-courses {
-            text-align: center;
-            color: #fff;
-            font-size: 1.3rem;
-            margin-top: 40px;
-            text-shadow: 1px 1px 0 #d7263d, 0 2px 8px #d7263d44;
-        }
-        
-        @media (max-width: 700px) {
-            .container {
-                padding: 8px;
-            }
-            .course-card {
-                width: 98vw;
-            }
-            .search-input {
-                width: 90vw;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>RWA - Courses</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg-1: #0f1724;
+      --card: #0b1220;
+      --accent: #ff5858;
+      --accent-2: #ffb347;
+      --muted: #bfc8d6;
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(800px 400px at 10% 10%, rgba(255,180,71,0.07), transparent 8%),
+        linear-gradient(180deg,#061022 0%, #0f1724 100%);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:28px;
+    }
+
+    .app {
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .title {
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+    .logo {
+      width:56px;height:56px;border-radius:12px;
+      background: linear-gradient(135deg,var(--accent-2),var(--accent));
+      display:flex;align-items:center;justify-content:center;font-weight:900;color:#102033;
+      box-shadow: 0 6px 20px rgba(255,88,88,0.12);
+      font-size:18px;
+    }
+    h1{
+      margin:0;font-size:1.6rem;letter-spacing:0.4px;color:#fff;
+    }
+    .sub {
+      color:var(--muted); font-size:0.95rem;
+    }
+
+    /* search area */
+    .controls {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .search {
+      display:flex;
+      gap:8px;
+      background:var(--glass);
+      padding:6px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 6px 24px rgba(2,6,23,0.35);
+    }
+    .search input{
+      background:transparent;border:0;padding:10px 12px;color:#eaf2ff;outline:none;width:320px;
+      font-size:0.98rem;
+    }
+    .btn {
+      background: linear-gradient(90deg,var(--accent-2),var(--accent));
+      color:#071025;padding:10px 14px;border-radius:10px;border:none;font-weight:800;
+      cursor:pointer; box-shadow: 0 10px 30px rgba(255,88,88,0.12);
+    }
+    .btn.ghost {
+      background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:700;
+      padding:9px 12px;border-radius:10px; cursor:pointer;
+    }
+
+    /* grid */
+    .grid {
+      margin-top:20px;
+      display:grid;
+      grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+      gap:18px;
+    }
+
+    /* card */
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.03);
+      transition: transform .18s ease, box-shadow .18s ease;
+      display:flex;
+      flex-direction:column;
+      min-height:320px;
+    }
+    .card:hover{ transform: translateY(-8px); box-shadow: 0 18px 50px rgba(2,6,23,0.6); }
+
+    .thumb {
+      height:160px;
+      width:100%;
+      display:block;
+      object-fit:cover;
+      background:linear-gradient(90deg,#0b1230,#082033);
+    }
+    .card-body {
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      flex:1;
+    }
+
+    .row-1 {
+      display:flex;align-items:flex-start;gap:10px;justify-content:space-between;
+    }
+    .title-line{
+      display:flex;flex-direction:column;gap:6px;flex:1;
+    }
+    .course-name{
+      margin:0;color:#fff;font-weight:800;font-size:1.02rem;line-height:1.15;
+      letter-spacing:0.2px;
+    }
+    .exam-name{ font-size:0.88rem;color:var(--accent-2); font-weight:700; }
+
+    .desc {
+      font-size:0.9rem;color:var(--muted);line-height:1.3; max-height:3.9em; overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta {
+      display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;
+    }
+    .left-meta { display:flex;gap:10px;align-items:center; }
+    .date-box{
+      background:rgba(255,255,255,0.03); padding:8px 10px;border-radius:10px;font-weight:700;
+      display:flex;gap:8px;align-items:center;color:var(--muted);font-size:0.88rem;
+    }
+    .date-box .dot{ width:32px;height:32px;border-radius:8px;background:linear-gradient(90deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#071025; }
+
+    .right-meta { display:flex;align-items:center;gap:8px; }
+
+    .price {
+      background: linear-gradient(90deg,var(--accent-2),var(--accent));
+      padding:8px 12px;border-radius:10px;color:#071025;font-weight:900; font-size:0.98rem;
+    }
+    .mrp { font-size:0.82rem;color:rgba(255,255,255,0.6); text-decoration:line-through; margin-left:8px; font-weight:700; }
+
+    .cta {
+      width:100%;
+      text-align:center;
+      margin-top:10px;
+    }
+    .open-btn {
+      width:100%;
+      padding:10px 12px;border-radius:10px;border:0;background:transparent;color:var(--accent-2);
+      border:1px solid rgba(255,255,255,0.06); cursor:pointer;font-weight:800; transition:all .12s;
+    }
+    .open-btn:hover { background: rgba(255,255,255,0.03); color:#fff; transform:translateY(-3px); border-color:rgba(255,255,255,0.08); }
+
+    .tag-top {
+      position:relative;
+      top:-44px; left:12px;
+      display:inline-block;padding:6px 10px;background:rgba(0,0,0,0.5);color:#fff;border-radius:999px;font-weight:800;font-size:0.8rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .empty {
+      text-align:center;color:var(--muted);padding:40px;border-radius:12px;background:var(--glass-2);
+    }
+
+    @media (max-width:760px){
+      .search input{width:160px}
+      .grid{grid-template-columns: repeat(auto-fill,minmax(200px,1fr))}
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1 id="appHeading">Loading...</h1>
-        <div class="search-bar">
-            <input id="searchInput" class="search-input" type="text" placeholder="Search courses...">
-            <button id="clearBtn" class="search-clear" type="button">Clear</button>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="logo">RWA</div>
+        <div>
+          <h1>RWA Courses</h1>
+          <div class="sub">All courses — thumbnails, price & start date</div>
         </div>
-        <div id="courseList" class="course-list"></div>
-        <div id="noCourses" class="no-courses" style="display:none;">No courses found.</div>
-    </div>
-    <script>
-        function getQueryParam(name) {
-            const url = new URL(window.location.href);
-            return url.searchParams.get(name);
-        }
+      </div>
 
-        let allCourses = [];
-        let appName = "App"; // Default
+      <div class="controls" role="search">
+        <div class="search" aria-label="Search courses">
+          <svg style="width:18px;height:18px;opacity:0.8;margin-left:8px" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="#dfe9ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#dfe9ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input id="searchInput" type="search" placeholder="Search by course or exam" aria-label="Search courses" />
+        </div>
+        <button id="clearBtn" class="btn ghost" title="Clear search">Clear</button>
+        <button id="refreshBtn" class="btn" title="Refresh list">Refresh</button>
+      </div>
+    </header>
 
-        // Fetch from local Python backend
-        async function fetchCourses() {
-            try {
-                const appId = getQueryParam("app_id");
-                const res = await fetch(`https://adeswal-eng.onrender.com/api/get/courselistnewv2`);
-                const json = await res.json();
-                // Set app name from backend response if available
-                if (json.app_name) {
-                    appName = json.app_name;
-                    document.getElementById('appHeading').textContent = appName;
-                } else {
-                    document.getElementById('appHeading').textContent = "Courses";
-                }
-                if (json.status === 200 && Array.isArray(json.data) && json.data.length > 0) {
-                    allCourses = json.data;
-                    renderCourses(allCourses, appId); // <-- Pass appId here
-                    document.getElementById('noCourses').style.display = 'none';
-                } else if (json.status === 401) {
-                    document.getElementById('noCourses').textContent = "Unauthorized: Invalid token or user id.";
-                    document.getElementById('noCourses').style.display = 'block';
-                } else {
-                    document.getElementById('noCourses').style.display = 'block';
-                }
-            } catch (err) {
-                document.getElementById('appHeading').textContent = "Courses";
-                document.getElementById('noCourses').textContent = "Failed to load courses.";
-                document.getElementById('noCourses').style.display = 'block';
-            }
-        }
+    <main>
+      <section id="grid" class="grid" aria-live="polite"></section>
+      <div id="empty" class="empty" style="display:none;margin-top:18px">No courses match your search.</div>
+    </main>
+  </div>
 
-        function renderCourses(courses, appId) { // <-- Accept appId here
-            const courseList = document.getElementById('courseList');
-            courseList.innerHTML = '';
-            courses.forEach(course => {
-                if (course.enable !== "1") return;
+<script>
+  // helper to get query param (not used for index but kept)
+  function getQueryParam(name){ const u=new URL(window.location.href); return u.searchParams.get(name); }
 
-                const card = document.createElement('div');
-                card.className = 'course-card';
-                card.tabIndex = 0;
-                card.setAttribute('aria-label', course.course_name);
+  // strip HTML tags and limit text
+  function stripHtml(html){
+    if(!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    const text = tmp.textContent || tmp.innerText || '';
+    return text.replace(/\s+/g,' ').trim();
+  }
+  function excerptText(text, n=140){
+    if(!text) return '';
+    if(text.length<=n) return text;
+    return text.slice(0,n).trim() + '…';
+  }
 
-                const thumb = document.createElement('img');
-                thumb.className = 'course-thumb';
-                thumb.src = course.course_thumbnail || 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                thumb.alt = course.course_name;
-                thumb.onerror = function() {
-                    this.onerror = null;
-                    this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                };
+  // price resolver (from API fields)
+  function resolvePrice(course){
+    const p = course.price;
+    const mrp = Number(course.mrp) || 0;
+    const priceNum = Number(String(p).replace(/[^0-9.-]+/g,'')) || 0;
+    if(priceNum > 0) return {label:`₹${priceNum}`, mrp: (mrp>0 && mrp>priceNum) ? `₹${mrp}` : ''};
+    if(String(course.is_paid) === "1" || course.is_paid === 1) return {label:'Paid', mrp:''};
+    // some courses in API use negative sentinel -3 for "paid" — treat negative as Paid
+    if(Number(p) < 0) return {label:'Paid', mrp:''};
+    return {label:'Free', mrp:''};
+  }
 
-                const content = document.createElement('div');
-                content.className = 'course-content';
+  // format date display
+  function prettyDate(d){
+    if(!d) return '-';
+    // try to parse 'YYYY-MM-DD' or with time
+    const tryParse = (s) => {
+      const t = new Date(s);
+      if(!isNaN(t)) return t;
+      // try replacing space with T or slicing first 10 chars
+      const t2 = new Date(String(s).slice(0,10));
+      if(!isNaN(t2)) return t2;
+      return null;
+    };
+    const dt = tryParse(d);
+    if(!dt) return d;
+    return dt.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  }
 
-                const title = document.createElement('div');
-                title.className = 'course-title';
-                title.textContent = course.course_name;
+  // render list of cards
+  function renderList(courses){
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    grid.innerHTML = '';
+    const shown = courses.filter(c => String(c.enable) === "1");
+    if(!shown.length){
+      empty.style.display = 'block';
+      return;
+    } else empty.style.display = 'none';
 
-                const exam = document.createElement('div');
-                exam.className = 'course-exam';
-                exam.textContent = course.exam_name || '';
+    // sort: featured then start_date ascending
+    shown.sort((a,b)=>{
+      const fa = Number(a.is_featured||a.featured||0), fb = Number(b.is_featured||b.featured||0);
+      if(fb - fa) return fb-fa;
+      const da = new Date(a.start_date || a.startDate || a.start || 0).getTime() || 0;
+      const db = new Date(b.start_date || b.startDate || b.start || 0).getTime() || 0;
+      return da - db;
+    });
 
-                const meta = document.createElement('div');
-                meta.className = 'course-meta';
-                meta.innerHTML = `
-                    <span>Start: ${course.start_date || '-'}</span>
-                `;
+    shown.forEach(course=>{
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.setAttribute('tabindex','0');
+      card.setAttribute('aria-label', course.course_name || 'Course');
 
-                content.appendChild(title);
-                content.appendChild(exam);
-                content.appendChild(meta);
+      // thumbnail
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.alt = course.course_name || 'thumbnail';
+      img.src = course.course_thumbnail || 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
+      img.onerror = function(){ this.onerror=null; this.src='https://i.postimg.cc/x1M0YN5Z/sunny.jpg' };
 
-                card.appendChild(thumb);
-                card.appendChild(content);
+      card.appendChild(img);
 
-                // Redirect to course-detail.html on click
-                card.style.cursor = "pointer";
-                card.onmouseover = function() {
-                    card.style.transform = "scale(1.04) rotate(-1deg)";
-                };
-                card.onmouseout = function() {
-                    card.style.transform = "";
-                };
-                card.onclick = function() {
-    window.location.href = `folder.html?courseId=${course.id}&parentId=-1`;
-};
+      const body = document.createElement('div');
+      body.className = 'card-body';
 
-                courseList.appendChild(card);
-            });
-            // If no enabled courses, show message
-            if (!courseList.hasChildNodes()) {
-                document.getElementById('noCourses').style.display = 'block';
-            }
-        }
+      const row1 = document.createElement('div');
+      row1.className = 'row-1';
 
-        // Search logic
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const clearBtn = document.getElementById('clearBtn');
-            searchInput.addEventListener('input', function() {
-                const val = searchInput.value.trim().toLowerCase();
-                if (!val) {
-                    renderCourses(allCourses);
-                    return;
-                }
-                const filtered = allCourses.filter(c =>
-                    (c.course_name && c.course_name.toLowerCase().includes(val)) ||
-                    (c.exam_name && c.exam_name.toLowerCase().includes(val))
-                );
-                renderCourses(filtered);
-            });
-            clearBtn.onclick = function() {
-                searchInput.value = "";
-                renderCourses(allCourses);
-            };
-        });
+      const left = document.createElement('div');
+      left.className = 'title-line';
 
-        fetchCourses();
-    </script>
+      const cname = document.createElement('h3');
+      cname.className = 'course-name';
+      cname.textContent = course.course_name || 'Untitled';
+
+      const exam = document.createElement('div');
+      exam.className = 'exam-name';
+      exam.textContent = course.exam_name || '';
+
+      left.appendChild(cname);
+      left.appendChild(exam);
+      row1.appendChild(left);
+
+      // optional tag if featured/new
+      if(String(course.is_featured||course.featured||0) === "1" || course.gif_display === "1"){
+        const tag = document.createElement('div');
+        tag.className = 'tag-top';
+        tag.textContent = (String(course.is_featured||course.featured||0) === "1") ? 'FEATURED' : 'NEW';
+        row1.appendChild(tag);
+      }
+
+      body.appendChild(row1);
+
+      // description excerpt
+      const raw = stripHtml(course.course_description || '');
+      if(raw){
+        const p = document.createElement('div');
+        p.className = 'desc';
+        p.textContent = excerptText(raw, 120);
+        body.appendChild(p);
+      }
+
+      // meta row
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const leftMeta = document.createElement('div');
+      leftMeta.className = 'left-meta';
+      const dbox = document.createElement('div');
+      dbox.className = 'date-box';
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.textContent = (course.start_date ? new Date(course.start_date).getDate() : '—');
+      dbox.appendChild(dot);
+      const dtext = document.createElement('div');
+      dtext.textContent = prettyDate(course.start_date || course.startDate || '');
+      dbox.appendChild(dtext);
+      leftMeta.appendChild(dbox);
+
+      meta.appendChild(leftMeta);
+
+      // right: price
+      const rightMeta = document.createElement('div');
+      rightMeta.className = 'right-meta';
+      const price = resolvePrice(course);
+      const priceBox = document.createElement('div');
+      priceBox.className = 'price';
+      priceBox.textContent = price.label;
+      rightMeta.appendChild(priceBox);
+      if(price.mrp){
+        const mrp = document.createElement('div');
+        mrp.className = 'mrp';
+        mrp.textContent = price.mrp;
+        rightMeta.appendChild(mrp);
+      }
+      meta.appendChild(rightMeta);
+
+      body.appendChild(meta);
+
+      // CTA button
+      const ctaWrap = document.createElement('div');
+      ctaWrap.className = 'cta';
+      const btn = document.createElement('button');
+      btn.className = 'open-btn';
+      btn.textContent = 'Open Content';
+      btn.onclick = function(){
+        // redirect to folder.html with courseId param (and parent_id -1)
+        const q = encodeURIComponent(course.id || course.course_id || '');
+        window.location.href = `folder.html?courseId=${q}&parent_id=-1`;
+      };
+      ctaWrap.appendChild(btn);
+      body.appendChild(ctaWrap);
+
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+  }
+
+  // fetch API and initialize
+  let allCourses = [];
+  async function load(){
+    try{
+      const res = await fetch('https://adeswal-eng.onrender.com/api/get/courselistnewv2');
+      const json = await res.json();
+      if(json && json.status === 200 && Array.isArray(json.data)){
+        allCourses = json.data;
+        renderList(allCourses);
+      } else {
+        document.getElementById('grid').innerHTML = `<div class="empty">No courses found.</div>`;
+      }
+    }catch(err){
+      console.error(err);
+      document.getElementById('grid').innerHTML = `<div class="empty">Failed to load courses.</div>`;
+    }
+  }
+
+  // search/filter
+  document.addEventListener('DOMContentLoaded', function(){
+    const s = document.getElementById('searchInput');
+    const clear = document.getElementById('clearBtn');
+    const refresh = document.getElementById('refreshBtn');
+
+    s.addEventListener('input', function(){
+      const v = s.value.trim().toLowerCase();
+      if(!v) return renderList(allCourses);
+      const filtered = allCourses.filter(c=>{
+        const name = (c.course_name||'').toLowerCase();
+        const exam = (c.exam_name||'').toLowerCase();
+        return name.includes(v) || exam.includes(v);
+      });
+      renderList(filtered);
+    });
+
+    clear.addEventListener('click', function(){ s.value=''; renderList(allCourses); });
+
+    refresh.addEventListener('click', function(){ load(); });
+
+    // initial load
+    load();
+  });
+</script>
 </body>
-
 </html>
