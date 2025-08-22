@@ -1,154 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Course Folders & Files</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        body {
-            background: linear-gradient(120deg, #00c3ff 0%, #ffff1c 100%);
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+        :root{
+            --accent-1:#00c3ff;
+            --accent-2:#ffcc00;
+            --card-bg: rgba(255,255,255,0.95);
+            --muted:#6b7280;
+            --danger:#d7263d;
         }
-        
-        .container {
-            max-width: 600px;
-            margin: 2rem auto;
-            background: rgba(255, 255, 255, 0.13);
-            border-radius: 18px;
-            box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.18);
-            padding: 2rem 1rem;
+        html,body{height:100%;margin:0;font-family:'Segoe UI',Roboto,Arial,sans-serif;background:linear-gradient(120deg,var(--accent-1) 0%, #ffff1c 100%);}
+        .wrap{max-width:1100px;margin:28px auto;padding:20px;}
+        .top {
+            display:flex;
+            gap:12px;
+            align-items:center;
+            margin-bottom:18px;
         }
-        
-        h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(90deg, #00ffb8, #008cff, #ff00c8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            font-weight: 700;
+        .title {
+            flex:1;
+            font-size:20px;
+            font-weight:700;
+            background: linear-gradient(90deg,#00ffb8,#008cff,#ff00c8);
+            -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
         }
-        
-        #folderList {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .folder-card {
-            background: linear-gradient(90deg, #fffbe7 0%, #ffe0e6 100%);
-            border-radius: 12px;
-            padding: 0.7rem 1rem;
-            box-shadow: 0 2px 12px 0 #d7263d22;
-            border: 2px solid #ffb347;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            cursor: pointer;
-            font-size: 1.08rem;
-            font-weight: 600;
-            color: #d7263d;
-            min-height: 48px;
-            transition: background 0.18s, transform 0.18s, border 0.18s;
-        }
-        
-        .folder-card:hover {
-            background: #ffb347;
-            color: #fff;
-            border-color: #d7263d;
-            transform: scale(1.04);
-        }
-        
-        .file-card {
-            background: rgba(255, 255, 255, 0.10);
-            border-radius: 10px;
-            padding: 0.7rem 1rem;
-            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            cursor: pointer;
-            font-size: 1.02rem;
-            font-weight: 500;
-            color: #d7263d;
-            min-height: 48px;
-            transition: background 0.18s, transform 0.18s;
-        }
-        
-        .file-card:hover {
-            background: #008cff;
-            color: #fff;
-            transform: scale(1.04);
-        }
-        
         .back-btn {
-            margin-bottom: 1rem;
-            background: #ff00c8;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1.2rem;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.18s;
+            background: linear-gradient(90deg,#ff00c8,#008cff);
+            color:#fff;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
         }
-        
-        .back-btn:hover {
-            background: #008cff;
+        .breadcrumb {
+            margin-top:8px;color:#111827;font-size:14px;
+            display:flex;gap:8px;align-items:center;flex-wrap:wrap;
         }
-        
-        .folder-thumb {
-            width: 32px;
-            height: 32px;
-            object-fit: cover;
-            border-radius: 7px;
-            margin-right: 8px;
-            background: #fff;
-            border: 1.2px solid #d7263d33;
+        .badge {
+            background:var(--card-bg);padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);
+            box-shadow:0 4px 14px rgba(0,0,0,0.06);
         }
-        
-        .thumb {
-            width: 32px;
-            height: 32px;
-            object-fit: cover;
-            border-radius: 7px;
-            margin-right: 8px;
-            background: #fff;
-            border: 1.2px solid #d7263d33;
+
+        .content {
+            margin-top:18px;
+            background: rgba(255,255,255,0.12);
+            border-radius:14px;padding:18px;
+            box-shadow:0 8px 32px rgba(31,38,135,0.06);
         }
-        
-        .folder-arrow {
-            margin-left: auto;
-            width: 18px;
-            height: 18px;
-            display: inline-block;
-            background: url('data:image/svg+xml;utf8,<svg fill=\"%23d7263d\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z\"/></svg>') no-repeat center center;
-            background-size: 18px 18px;
+
+        .grid {
+            display:grid;
+            grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+            gap:16px;
+        }
+
+        /* folder card */
+        .folder-card, .file-card {
+            background:var(--card-bg);
+            border-radius:12px;
+            overflow:hidden;
+            display:flex;
+            gap:12px;
+            align-items:center;
+            padding:12px;
+            border:1px solid rgba(0,0,0,0.06);
+            cursor:pointer;
+            transition: transform .16s ease, box-shadow .16s ease;
+            min-height:84px;
+        }
+        .folder-card:hover, .file-card:hover { transform: translateY(-6px); box-shadow:0 16px 40px rgba(0,0,0,0.08); }
+
+        .thumb-lg{
+            width:120px;height:72px;object-fit:cover;border-radius:8px;background:#f3f4f6;border:1px solid rgba(0,0,0,0.04);
+        }
+        .thumb-sm{ width:56px;height:56px;object-fit:cover;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.06); }
+
+        .meta {
+            display:flex;flex-direction:column;gap:6px;flex:1;
+        }
+        .name { font-weight:700;color:#111827;font-size:15px; }
+        .sub { color:var(--muted); font-size:13px; }
+
+        .actions { display:flex; gap:8px; align-items:center; margin-left:auto; }
+        .btn {
+            padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:600;
+            background:#2563eb;color:#fff;display:inline-flex;align-items:center;gap:8px;
+        }
+        .btn.pdf { background:#f3f4f6;color:#111;border:1px solid rgba(0,0,0,0.06); }
+        .small { font-size:12px;padding:6px 8px;border-radius:8px; }
+
+        .empty {
+            padding:36px;text-align:center;color:#fff;font-weight:700;
+            text-shadow:0 2px 8px rgba(0,0,0,0.25);
+        }
+
+        @media(max-width:700px){
+            .top{flex-direction:column;align-items:stretch;}
+            .thumb-lg{width:110px;height:64px;}
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Course Folders & Files</h2>
-        <button class="back-btn" id="backBtn" style="display:none">Back</button>
-        <div id="folderList">Loading...</div>
+    <div class="wrap">
+        <div class="top">
+            <div class="title">📂 Course Folders & Files</div>
+            <button id="backBtn" class="back-btn" style="display:none">← Back</button>
+        </div>
+
+        <div class="breadcrumb" id="breadcrumb">
+            <div class="badge" id="crumbRoot">Home</div>
+        </div>
+
+        <div class="content">
+            <div id="folderGrid" class="grid">
+                Loading...
+            </div>
+            <div id="emptyMsg" class="empty" style="display:none">No folders/files found.</div>
+        </div>
     </div>
 
-    <!-- CryptoJS (same as before) -->
+    <!-- CryptoJS (existing decrypt) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
     <script>
+        // Utility to read query params (support many names)
         function getQueryParam(name) {
             const url = new URL(window.location.href);
             return url.searchParams.get(name);
         }
 
-        // Decrypt function (same as your Python/previous logic)
+        // Keep existing decryption logic unchanged (uses same key/iv as your code)
         function decryptCustom(enc) {
             if (!enc) return "";
             try {
@@ -156,9 +137,7 @@
                 const key = CryptoJS.enc.Utf8.parse('638udh3829162018');
                 const iv = CryptoJS.enc.Utf8.parse('fedcba9876543210');
                 const encrypted = CryptoJS.enc.Base64.parse(b64);
-                const decrypted = CryptoJS.AES.decrypt({
-                    ciphertext: encrypted
-                }, key, {
+                const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
                     iv: iv,
                     mode: CryptoJS.mode.CBC,
                     padding: CryptoJS.pad.Pkcs7
@@ -169,241 +148,65 @@
             }
         }
 
+        // history stack for breadcrumb/back navigation
         let historyStack = [];
 
-        // ---------- UPDATED: use new API endpoint folder_contentsv3 ----------
-        async function loadFolderContents(courseId, parentId = -1, pushHistory = true) {
-            const folderList = document.getElementById('folderList');
-            folderList.innerHTML = 'Loading...';
-            try {
-                // New API URL (as you provided)
-                const url = `https://adeswal-eng.onrender.com/api/get/folder_contentsv3?course_id=${encodeURIComponent(courseId)}&parent_id=${encodeURIComponent(parentId)}`;
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
+        // current course & parent (kept global for callbacks)
+        let currentCourseId = getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId');
+        if (!currentCourseId) {
+            document.getElementById('folderGrid').innerHTML = '';
+            document.getElementById('emptyMsg').style.display = 'block';
+            document.getElementById('emptyMsg').textContent = 'Course ID missing in URL.';
+        }
 
-                folderList.innerHTML = '';
+        let currentParent = getQueryParam('parentid') || getQueryParam('parent_id') || getQueryParam('parentId') || -1;
 
-                const items = Array.isArray(json.data) ? json.data : [];
-                if (items.length === 0) {
-                    folderList.textContent = 'No folders/files found.';
-                    return;
+        // update breadcrumb UI
+        function renderBreadcrumb() {
+            const bc = document.getElementById('breadcrumb');
+            bc.innerHTML = '';
+            const root = document.createElement('div');
+            root.className = 'badge';
+            root.textContent = 'Home';
+            root.onclick = () => {
+                if (historyStack.length>0) {
+                    // clear history and load root
+                    historyStack = [];
+                    loadFolderContents(currentCourseId, -1, false);
+                    document.getElementById('backBtn').style.display = 'none';
                 }
+            };
+            bc.appendChild(root);
 
-                items.forEach(item => {
-                    // FOLDER detection (same checks as before)
-                    if (
-                        item.material_type === 'FOLDER' ||
-                        item.type === 'FOLDER' ||
-                        item.is_folder ||
-                        item.folder_name ||
-                        item.Title && item.material_type === 'FOLDER'
-                    ) {
-                        const card = document.createElement('div');
-                        card.className = 'folder-card';
+            // show path labels from historyStack
+            historyStack.forEach((h, idx) => {
+                const sep = document.createElement('div'); sep.textContent = '›'; sep.style.margin='0 6px'; sep.style.color='rgba(0,0,0,0.35)';
+                bc.appendChild(sep);
+                const b = document.createElement('div');
+                b.className = 'badge';
+                b.textContent = h.label || `Folder ${h.parentId}`;
+                b.onclick = () => {
+                    // navigate to specific history index (pop until that index)
+                    const target = historyStack[idx];
+                    historyStack = historyStack.slice(0, idx+1);
+                    loadFolderContents(currentCourseId, target.parentId, false);
+                    document.getElementById('backBtn').style.display = historyStack.length ? 'inline-block' : 'none';
+                };
+                bc.appendChild(b);
+            });
 
-                        // Thumb
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail || 'https://cdn-icons-png.flaticon.com/512/3767/3767084.png';
-                        thumb.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3767/3767084.png'; };
-                        card.appendChild(thumb);
-
-                        // Name
-                        const name = document.createElement('span');
-                        name.textContent = item.folder_name || item.name || item.Title || item.title || 'Folder';
-                        card.appendChild(name);
-
-                        // Arrow
-                        const arrow = document.createElement('span');
-                        arrow.className = 'folder-arrow';
-                        card.appendChild(arrow);
-
-                        card.onclick = function() {
-                            if (pushHistory) historyStack.push({ courseId, parentId });
-                            // drill into folder using item.id (or fallback parent_id)
-                            loadFolderContents(courseId, item.id || item.parent_id || item.parent || -1);
-                            document.getElementById('backBtn').style.display = 'inline-block';
-                        };
-
-                        folderList.appendChild(card);
-                        return;
-                    }
-
-                    // PDF
-                    if (item.material_type === 'PDF') {
-                        const card = document.createElement('div');
-                        card.className = 'file-card';
-
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail || 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
-                        thumb.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/337/337946.png'; };
-                        card.appendChild(thumb);
-
-                        const name = document.createElement('span');
-                        name.textContent = item.Title || item.title || item.name || 'PDF';
-                        card.appendChild(name);
-
-                        card.onclick = function() {
-                            // The code keeps previous sentinel + decrypt behaviour
-                            if (item.pdf_link === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==" ||
-                                item.pdf_link2 === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==") {
-                                showSadPopup("Sorry, we can't fetch your notes.");
-                            } else if (item.pdf_link) {
-                                const url = decryptCustom(item.pdf_link);
-                                if (url) window.open(url, '_blank');
-                                else showSadPopup("Sorry, we can't fetch your notes.");
-                            } else if (item.pdf_link2) {
-                                const url = decryptCustom(item.pdf_link2);
-                                if (url) window.open(url, '_blank');
-                                else showSadPopup("Sorry, we can't fetch your notes.");
-                            } else {
-                                showSadPopup("Sorry, we can't fetch your notes.");
-                            }
-                        };
-
-                        folderList.appendChild(card);
-                        return;
-                    }
-
-                    // IMAGE
-                    if (item.material_type === 'IMAGE' || (item.thumbnail && String(item.thumbnail).toLowerCase().endsWith('.png'))) {
-                        const card = document.createElement('div');
-                        card.className = 'file-card';
-
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                        thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
-
-                        const name = document.createElement('span');
-                        name.textContent = item.Title || item.title || item.name || 'Image';
-                        card.appendChild(name);
-
-                        card.onclick = function() {
-                            if (item.thumbnail) window.open(item.thumbnail, '_blank');
-                        };
-
-                        folderList.appendChild(card);
-                        return;
-                    }
-
-                    // LINK
-                    if (item.material_type === 'LINK' || item.file_link) {
-                        const card = document.createElement('div');
-                        card.className = 'file-card';
-
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                        thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
-
-                        const name = document.createElement('span');
-                        name.textContent = item.Title || item.title || item.name || 'Link';
-                        card.appendChild(name);
-
-                        card.onclick = function() {
-                            if (item.file_link === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==") {
-                                showSadPopup("Sorry, we can't fetch your notes.");
-                            } else if (item.file_link) {
-                                const url = decryptCustom(item.file_link);
-                                if (url) window.open(url, '_blank');
-                                else showSadPopup("Sorry, we can't fetch this link.");
-                            }
-                        };
-
-                        folderList.appendChild(card);
-                        return;
-                    }
-
-                    // VIDEO — UPDATED: always redirect to video-links.html with proper params
-                    if (item.material_type === 'VIDEO' || item.video_id) {
-                        const card = document.createElement('div');
-                        card.className = 'file-card';
-
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                        thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
-
-                        const name = document.createElement('span');
-                        name.textContent = item.Title || item.title || item.name || 'Video';
-                        card.appendChild(name);
-
-                        card.onclick = function() {
-                            // Build redirect URL to video-links.html (always)
-                            const appId = getQueryParam("app_id") || "";
-                            // Use item.id if present, else fall back to item.video_id
-                            const vidParam = encodeURIComponent(item.id || item.video_id || "");
-                            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
-                            const courseParam = encodeURIComponent(courseId);
-                            let redirectUrl = `video-links.html?courseId=${courseParam}&videoId=${vidParam}&ytflag=${ytflag}&folder_wise_course=1`;
-                            if (appId) redirectUrl += `&app_id=${encodeURIComponent(appId)}`;
-                            window.location.href = redirectUrl;
-                        };
-
-                        folderList.appendChild(card);
-                        return;
-                    }
-
-                    // DEFAULT FILE
-                    {
-                        const card = document.createElement('div');
-                        card.className = 'file-card';
-
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                        thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
-
-                        const name = document.createElement('span');
-                        name.textContent = item.Title || item.title || item.name || 'File';
-                        card.appendChild(name);
-
-                        card.onclick = function() {
-                            if (item.file_url || item.file_link) {
-                                // open direct link (if encrypted this won't decrypt unless item.file_link is encrypted and matches decrypt pattern)
-                                const link = item.file_url || item.file_link;
-                                // try decrypt, fallback to raw
-                                const d = decryptCustom(link);
-                                window.open(d || link, '_blank');
-                            }
-                        };
-
-                        folderList.appendChild(card);
-                    }
-                });
-
-            } catch (err) {
-                console.error(err);
-                folderList.innerHTML = 'Failed to load folders/files.';
+            // current folder name
+            if (currentParent && String(currentParent) !== '-1') {
+                const sep = document.createElement('div'); sep.textContent = '›'; sep.style.margin='0 6px'; sep.style.color='rgba(0,0,0,0.35)';
+                bc.appendChild(sep);
+                const cur = document.createElement('div');
+                cur.className = 'badge';
+                cur.textContent = `Folder ${currentParent}`;
+                bc.appendChild(cur);
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // accept either 'courseid' or 'course_id' in query params
-            const courseId = getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId');
-            if (!courseId) {
-                document.getElementById('folderList').textContent = 'Course ID missing in URL.';
-                return;
-            }
-            loadFolderContents(courseId, -1);
-
-            document.getElementById('backBtn').onclick = function() {
-                if (historyStack.length > 0) {
-                    const prev = historyStack.pop();
-                    loadFolderContents(prev.courseId, prev.parentId, false);
-                    if (historyStack.length === 0) this.style.display = 'none';
-                }
-            };
-        });
-
-        // Sad popup (unchanged)
+        // show sad popup (kept as before)
         function showSadPopup(msg) {
             let old = document.getElementById('sadPopupBg');
             if (old) old.remove();
@@ -467,6 +270,262 @@
             popupBg.appendChild(popup);
             document.body.appendChild(popupBg);
         }
+
+        // main loader - uses your new API folder_contentsv3
+        async function loadFolderContents(courseId, parentId = -1, pushHistory = true) {
+            const grid = document.getElementById('folderGrid');
+            const empty = document.getElementById('emptyMsg');
+            grid.innerHTML = 'Loading...';
+            empty.style.display = 'none';
+            renderBreadcrumb();
+
+            try {
+                const url = `https://adeswal-eng.onrender.com/api/get/folder_contentsv3?course_id=${encodeURIComponent(courseId)}&parent_id=${encodeURIComponent(parentId)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+
+                grid.innerHTML = '';
+                const items = Array.isArray(json.data) ? json.data : [];
+
+                if (items.length === 0) {
+                    empty.style.display = 'block';
+                    empty.textContent = 'No folders/files found.';
+                    return;
+                }
+
+                // update breadcrumb label for current entry if pushed
+                if (pushHistory && String(parentId) !== '-1') {
+                    // find the folder name from items? if not available, store generic
+                    historyStack.push({ courseId, parentId, label: `Folder ${parentId}` });
+                    document.getElementById('backBtn').style.display = 'inline-block';
+                }
+                currentParent = parentId;
+                renderBreadcrumb();
+
+                items.forEach(item => {
+                    // FOLDER
+                    const isFolder = item.material_type === 'FOLDER' || item.type === 'FOLDER' || item.is_folder || item.folder_name || (item.Title && item.material_type==='FOLDER');
+                    if (isFolder) {
+                        const el = document.createElement('div');
+                        el.className = 'folder-card';
+                        el.onclick = () => {
+                            // push readable label if available
+                            const label = item.Title || item.folder_name || item.name || 'Folder';
+                            historyStack.push({ courseId, parentId: item.id || item.parent_id || item.parent || -1, label });
+                            loadFolderContents(courseId, item.id || item.parent_id || item.parent || -1, false);
+                            document.getElementById('backBtn').style.display = 'inline-block';
+                        };
+
+                        const img = document.createElement('img');
+                        img.className = 'thumb-sm';
+                        img.src = item.thumbnail || 'https://cdn-icons-png.flaticon.com/512/3767/3767084.png';
+                        img.onerror = function(){ this.src='https://cdn-icons-png.flaticon.com/512/3767/3767084.png'; };
+
+                        const meta = document.createElement('div');
+                        meta.className = 'meta';
+                        const name = document.createElement('div'); name.className='name'; name.textContent = item.Title || item.folder_name || item.name || 'Folder';
+                        const sub = document.createElement('div'); sub.className='sub'; sub.textContent = `${item.videos_count || 0} videos • ${item.files_count || 0} files`;
+
+                        meta.appendChild(name); meta.appendChild(sub);
+
+                        const arrow = document.createElement('div'); arrow.className='actions'; arrow.innerHTML = '<div class="small">Open</div>';
+
+                        el.appendChild(img); el.appendChild(meta); el.appendChild(arrow);
+                        grid.appendChild(el);
+                        return;
+                    }
+
+                    // PDF
+                    if (item.material_type === 'PDF') {
+                        const el = document.createElement('div');
+                        el.className = 'file-card';
+
+                        const img = document.createElement('img');
+                        img.className = 'thumb-lg';
+                        img.src = item.thumbnail || 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
+                        img.onerror = function(){ this.src='https://cdn-icons-png.flaticon.com/512/337/337946.png'; };
+
+                        const meta = document.createElement('div'); meta.className='meta';
+                        const name = document.createElement('div'); name.className='name'; name.textContent = item.Title || item.title || item.name || 'PDF';
+                        const sub = document.createElement('div'); sub.className='sub'; sub.textContent = item.date_and_time || item.event_date || '';
+                        meta.appendChild(name); meta.appendChild(sub);
+
+                        const actions = document.createElement('div'); actions.className='actions';
+                        const btnPdf = document.createElement('button'); btnPdf.className='btn pdf'; btnPdf.textContent='View PDF';
+                        btnPdf.onclick = (ev) => { ev.stopPropagation(); openPdfFromItem(item); };
+                        actions.appendChild(btnPdf);
+
+                        el.appendChild(img); el.appendChild(meta); el.appendChild(actions);
+                        grid.appendChild(el);
+                        return;
+                    }
+
+                    // IMAGE
+                    if (item.material_type === 'IMAGE' || (item.thumbnail && String(item.thumbnail).toLowerCase().endsWith('.png')) ) {
+                        const el = document.createElement('div'); el.className='file-card';
+                        const img = document.createElement('img'); img.className='thumb-lg'; img.src = item.thumbnail || 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
+                        img.onerror = function(){ this.src='https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
+                        const meta = document.createElement('div'); meta.className='meta';
+                        const name = document.createElement('div'); name.className='name'; name.textContent = item.Title || item.title || item.name || 'Image';
+                        const sub = document.createElement('div'); sub.className='sub'; sub.textContent = item.event_date || '';
+                        meta.appendChild(name); meta.appendChild(sub);
+                        el.appendChild(img); el.appendChild(meta);
+                        el.onclick = () => { if(item.thumbnail) window.open(item.thumbnail,'_blank'); };
+                        grid.appendChild(el);
+                        return;
+                    }
+
+                    // LINK
+                    if (item.material_type === 'LINK' || item.file_link) {
+                        const el = document.createElement('div'); el.className='file-card';
+                        const img = document.createElement('img'); img.className='thumb-lg'; img.src = item.thumbnail || 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
+                        img.onerror = function(){ this.src='https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
+                        const meta = document.createElement('div'); meta.className='meta';
+                        const name = document.createElement('div'); name.className='name'; name.textContent = item.Title || item.title || item.name || 'Link';
+                        const sub = document.createElement('div'); sub.className='sub'; sub.textContent = item.event_date || '';
+                        meta.appendChild(name); meta.appendChild(sub);
+                        const actions = document.createElement('div'); actions.className='actions';
+                        const btn = document.createElement('button'); btn.className='btn pdf'; btn.textContent='Open Link';
+                        btn.onclick = (ev) => { ev.stopPropagation(); openLinkFromItem(item); };
+                        actions.appendChild(btn);
+                        el.appendChild(img); el.appendChild(meta); el.appendChild(actions);
+                        grid.appendChild(el);
+                        return;
+                    }
+
+                    // VIDEO (always redirect to video-links.html)
+                    if (item.material_type === 'VIDEO' || item.video_id || item.id) {
+                        const el = document.createElement('div'); el.className='file-card';
+                        const img = document.createElement('img'); img.className='thumb-lg';
+                        img.src = item.thumbnail || 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
+                        img.onerror = function(){ this.src='https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
+
+                        const meta = document.createElement('div'); meta.className='meta';
+                        const name = document.createElement('div'); name.className='name'; name.textContent = item.Title || item.title || item.name || 'Video';
+                        const sub = document.createElement('div'); sub.className='sub'; sub.textContent = `${item.duration || ''} ${item.date_and_time ? '• ' + item.date_and_time : ''}`;
+
+                        meta.appendChild(name); meta.appendChild(sub);
+
+                        const actions = document.createElement('div'); actions.className='actions';
+                        const playBtn = document.createElement('button'); playBtn.className='btn'; playBtn.textContent='▶ Links';
+                        playBtn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            openVideoLinks(item);
+                        };
+
+                        // PDF button if pdf exists (encrypted)
+                        if (item.pdf_link || item.pdf_link2) {
+                            const pdfBtn = document.createElement('button'); pdfBtn.className='btn pdf'; pdfBtn.textContent='📄 PDF';
+                            pdfBtn.onclick = (ev) => { ev.stopPropagation(); openPdfFromItem(item); };
+                            actions.appendChild(pdfBtn);
+                        }
+
+                        actions.appendChild(playBtn);
+                        el.appendChild(img); el.appendChild(meta); el.appendChild(actions);
+
+                        // also let clicking whole card open links
+                        el.onclick = () => openVideoLinks(item);
+
+                        grid.appendChild(el);
+                        return;
+                    }
+
+                    // DEFAULT fallback file element
+                    {
+                        const el = document.createElement('div'); el.className='file-card';
+                        const img = document.createElement('img'); img.className='thumb-lg';
+                        img.src = item.thumbnail || 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
+                        img.onerror = function(){ this.src='https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
+                        const meta = document.createElement('div'); meta.className='meta';
+                        const name = document.createElement('div'); name.className='name'; name.textContent = item.Title || item.title || item.name || 'File';
+                        const sub = document.createElement('div'); sub.className='sub'; sub.textContent = item.event_date || '';
+                        meta.appendChild(name); meta.appendChild(sub);
+                        el.appendChild(img); el.appendChild(meta);
+                        el.onclick = () => {
+                            const link = item.file_url || item.file_link;
+                            if (link) {
+                                const d = decryptCustom(link);
+                                window.open(d || link, '_blank');
+                            }
+                        };
+                        grid.appendChild(el);
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('folderGrid').innerHTML = '';
+                empty.style.display = 'block';
+                empty.textContent = 'Failed to load folders/files.';
+            }
+        }
+
+        // open external link (decrypt if needed)
+        function openLinkFromItem(item) {
+            const raw = item.file_link || item.file_url;
+            if (!raw) { showSadPopup("Sorry, we can't fetch this link."); return; }
+            if (raw === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==") {
+                showSadPopup("Sorry, we can't fetch this link.");
+                return;
+            }
+            const url = decryptCustom(raw) || raw;
+            if (url) window.open(url, '_blank');
+            else showSadPopup("Sorry, we can't fetch this link.");
+        }
+
+        // PDF handler (uses decryptCustom)
+        function openPdfFromItem(item) {
+            // Try pdf_link first then pdf_link2
+            const sentinel = "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==";
+            const raw = (item.pdf_link === sentinel ? '' : item.pdf_link) || (item.pdf_link2 === sentinel ? '' : item.pdf_link2) || '';
+            if (!raw) { showSadPopup("Sorry, we can't fetch your notes."); return; }
+            const url = decryptCustom(raw);
+            if (url) window.open(url, '_blank');
+            else showSadPopup("Sorry, we can't fetch your notes.");
+        }
+
+        // Build and open video-links page. Uses new API params expected by video-links.html
+        function openVideoLinks(item) {
+            // Prefer item.id (folder api returns id) else item.video_id
+            const videoId = encodeURIComponent(item.id || item.video_id || '');
+            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
+            const courseParam = encodeURIComponent(currentCourseId);
+            const appParam = getQueryParam('app_id') || getQueryParam('appId') || getQueryParam('appid') || '';
+            let redirect = `video-links.html?course_id=${courseParam}&video_id=${videoId}&ytflag=${ytflag}&folder_wise_course=1`;
+            if (appParam) redirect += `&app_id=${encodeURIComponent(appParam)}`;
+            // Also include lc_app_api_url param empty as your new API showed — not required but safe:
+            redirect += `&lc_app_api_url=`;
+            window.location.href = redirect;
+        }
+
+        // Back button behaviour
+        document.getElementById('backBtn').onclick = function() {
+            if (historyStack.length > 0) {
+                // pop last and load its parentId (go up one level)
+                historyStack.pop();
+                const prev = historyStack.length ? historyStack[historyStack.length - 1] : null;
+                if (prev) {
+                    loadFolderContents(prev.courseId, prev.parentId, false);
+                } else {
+                    loadFolderContents(currentCourseId, -1, false);
+                    this.style.display = 'none';
+                }
+                this.style.display = historyStack.length ? 'inline-block' : 'none';
+            } else {
+                // nothing in history -> load root
+                loadFolderContents(currentCourseId, -1, false);
+                this.style.display = 'none';
+            }
+        };
+
+        // initialize on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!currentCourseId) return;
+            loadFolderContents(currentCourseId, currentParent || -1, false);
+            // show back button if history has items
+            document.getElementById('backBtn').style.display = historyStack.length ? 'inline-block' : 'none';
+        });
     </script>
 </body>
 </html>
