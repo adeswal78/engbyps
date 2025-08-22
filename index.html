@@ -269,10 +269,10 @@
                     // If course is from new API (courselistnewv2) or is a folder/material_type
                     if ((course.type === 'COURSE' && course.hasOwnProperty('parent_id')) || course.material_type === 'FOLDER') {
                         // New API course or folder: open folder-view.html
-                        window.location.href = `folder-view.html?app_id=${appId}&courseid=${course.id}`;
+                        window.location.href = `folder-view.html?course_id=${courseId}&parent_id=${parentId}`;
                     } else {
                         // Old API course: open course-detail.html
-                        window.location.href = `course-detail.html?app_id=${appId}&courseid=${course.id}`;
+                        window.location.href = `course-detail.html?course_id=${courseId}&parent_id=${parentId}`;
                     }
                 };
 
