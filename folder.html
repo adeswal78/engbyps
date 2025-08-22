@@ -5,143 +5,225 @@
     <title>Course Folders & Files</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            background: linear-gradient(120deg, #00c3ff 0%, #ffff1c 100%);
+        :root{
+            --bg1: #00c3ff;
+            --bg2: #ffff1c;
+            --card-start: #fffbe7;
+            --card-end: #ffe0e6;
+            --accent: #d7263d;
+            --btn-primary: linear-gradient(90deg, #008cff 0%, #00c3ff 100%);
+            --btn-cta: linear-gradient(90deg, #ff00c8 0%, #ffb347 100%);
+            --muted: #6b7280;
+        }
+
+        html,body{
+            height:100%;
+            margin:0;
             font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+            background: linear-gradient(120deg, var(--bg1) 0%, var(--bg2) 100%);
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
         }
-        
+
         .container {
-            max-width: 600px;
-            margin: 2rem auto;
-            background: rgba(255, 255, 255, 0.13);
-            border-radius: 18px;
-            box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.18);
-            padding: 2rem 1rem;
+            max-width: 980px;
+            margin: 22px auto;
+            background: rgba(255,255,255,0.12);
+            border-radius: 14px;
+            box-shadow: 0 8px 40px rgba(16,24,40,0.12);
+            padding: 20px;
+            backdrop-filter: blur(6px);
         }
-        
+
+        header.top {
+            display:flex;
+            gap:12px;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom: 14px;
+            flex-wrap:wrap;
+        }
+
         h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
+            margin:0;
+            font-size:20px;
+            font-weight:700;
             background: linear-gradient(90deg, #00ffb8, #008cff, #ff00c8);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: transparent;
-            font-weight: 700;
         }
-        
-        #folderList {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+
+        .top-right {
+            display:flex;
+            gap:10px;
+            align-items:center;
         }
-        
-        .folder-card {
-            background: linear-gradient(90deg, #fffbe7 0%, #ffe0e6 100%);
-            border-radius: 12px;
-            padding: 0.7rem 1rem;
-            box-shadow: 0 2px 12px 0 #d7263d22;
-            border: 2px solid #ffb347;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            cursor: pointer;
-            font-size: 1.08rem;
-            font-weight: 600;
-            color: #d7263d;
-            min-height: 48px;
-            transition: background 0.18s, transform 0.18s, border 0.18s;
-        }
-        
-        .folder-card:hover {
-            background: #ffb347;
-            color: #fff;
-            border-color: #d7263d;
-            transform: scale(1.04);
-        }
-        
-        .file-card {
-            background: rgba(255, 255, 255, 0.10);
-            border-radius: 10px;
-            padding: 0.7rem 1rem;
-            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            cursor: pointer;
-            font-size: 1.02rem;
-            font-weight: 500;
-            color: #d7263d;
-            min-height: 48px;
-            transition: background 0.18s, transform 0.18s;
-        }
-        
-        .file-card:hover {
-            background: #008cff;
-            color: #fff;
-            transform: scale(1.04);
-        }
-        
+
         .back-btn {
-            margin-bottom: 1rem;
-            background: #ff00c8;
+            background: var(--btn-cta);
             color: #fff;
             border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1.2rem;
-            font-size: 1rem;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-weight:700;
             cursor: pointer;
-            transition: background 0.18s;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
         }
-        
-        .back-btn:hover {
-            background: #008cff;
+
+        #folderList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
         }
-        
-        .folder-thumb {
-            width: 32px;
-            height: 32px;
+
+        .folder-card, .file-card {
+            background: linear-gradient(135deg, var(--card-start) 0%, var(--card-end) 100%);
+            border-radius: 12px;
+            padding: 12px;
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.06);
+            cursor:pointer;
+            transition: transform .16s ease, box-shadow .16s ease;
+        }
+
+        .folder-card:hover, .file-card:hover { transform: translateY(-6px); box-shadow: 0 18px 36px rgba(0,0,0,0.12); }
+
+        /* video/file layout */
+        .file-top {
+            display:flex;
+            gap:12px;
+            align-items:flex-start;
+        }
+
+        /* larger video thumbnail */
+        .video-thumb {
+            width: 220px;
+            height: 124px;
             object-fit: cover;
-            border-radius: 7px;
-            margin-right: 8px;
-            background: #fff;
-            border: 1.2px solid #d7263d33;
+            border-radius: 10px;
+            flex-shrink: 0;
+            background: #f3f4f6;
+            border: 1px solid rgba(0,0,0,0.04);
         }
-        
-        .thumb {
-            width: 32px;
-            height: 32px;
-            object-fit: cover;
-            border-radius: 7px;
-            margin-right: 8px;
-            background: #fff;
-            border: 1.2px solid #d7263d33;
+
+        .meta {
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+            flex:1;
+            min-width: 0;
         }
-        
-        .folder-arrow {
-            margin-left: auto;
-            width: 18px;
-            height: 18px;
-            display: inline-block;
-            background: url('data:image/svg+xml;utf8,<svg fill=\"%23d7263d\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z\"/></svg>') no-repeat center center;
-            background-size: 18px 18px;
+
+        .title {
+            font-weight:700;
+            color: var(--accent);
+            font-size: 16px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+
+        .desc {
+            color: var(--muted);
+            font-size: 13px;
+            display:inline-block;
+            max-width: 100%;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+
+        .meta-bottom {
+            display:flex;
+            gap:8px;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.9);
+            padding:6px 8px;
+            border-radius:8px;
+            font-weight:700;
+            font-size:12px;
+            border:1px solid rgba(0,0,0,0.04);
+        }
+
+        .actions-row {
+            display:flex;
+            gap:8px;
+            align-items:center;
+            margin-top:6px;
+        }
+
+        .btn {
+            padding:8px 12px;
+            border-radius:10px;
+            border:none;
+            font-weight:700;
+            cursor:pointer;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .btn-links {
+            background: var(--btn-primary);
+            color:#fff;
+        }
+
+        .btn-pdf {
+            background: #fff;
+            color:#111;
+            border:1px solid rgba(0,0,0,0.06);
+        }
+
+        .thumb-small {
+            width:36px;height:36px;border-radius:8px;object-fit:cover;background:#fff;border:1px solid rgba(0,0,0,0.06);
+        }
+
+        .file-bottom {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:8px;
+        }
+
+        .file-name { font-weight:700; color:#111; font-size:15px; }
+
+        .empty {
+            padding:24px;
+            text-align:center;
+            font-weight:700;
+            color:#fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+
+        @media(max-width:800px){
+            .file-top { flex-direction:column; align-items:stretch; }
+            .video-thumb { width:100%; height:160px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Course Folders & Files</h2>
-        <button class="back-btn" id="backBtn" style="display:none">Back</button>
+        <header class="top">
+            <h2>Course Folders & Files</h2>
+            <div class="top-right">
+                <button id="backBtn" class="back-btn" style="display:none">← Back</button>
+            </div>
+        </header>
+
         <div id="folderList">Loading...</div>
+        <div id="empty" class="empty" style="display:none">No folders/files found.</div>
     </div>
 
-    <!-- CryptoJS (same as before) -->
+    <!-- CryptoJS for decrypt (existing logic retained) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
     <script>
         function getQueryParam(name) {
             const url = new URL(window.location.href);
@@ -171,12 +253,12 @@
 
         let historyStack = [];
 
-        // ---------- UPDATED: use new API endpoint folder_contentsv3 ----------
         async function loadFolderContents(courseId, parentId = -1, pushHistory = true) {
             const folderList = document.getElementById('folderList');
+            const empty = document.getElementById('empty');
             folderList.innerHTML = 'Loading...';
+            empty.style.display = 'none';
             try {
-                // New API URL (as you provided)
                 const url = `https://adeswal-eng.onrender.com/api/get/folder_contentsv3?course_id=${encodeURIComponent(courseId)}&parent_id=${encodeURIComponent(parentId)}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -186,42 +268,63 @@
 
                 const items = Array.isArray(json.data) ? json.data : [];
                 if (items.length === 0) {
-                    folderList.textContent = 'No folders/files found.';
+                    folderList.textContent = '';
+                    empty.style.display = 'block';
+                    empty.textContent = 'No folders/files found.';
                     return;
                 }
 
                 items.forEach(item => {
-                    // FOLDER detection (same checks as before)
+                    // FOLDER detection
                     if (
                         item.material_type === 'FOLDER' ||
                         item.type === 'FOLDER' ||
                         item.is_folder ||
                         item.folder_name ||
-                        item.Title && item.material_type === 'FOLDER'
+                        (item.Title && item.material_type === 'FOLDER')
                     ) {
                         const card = document.createElement('div');
                         card.className = 'folder-card';
 
-                        // Thumb
+                        const meta = document.createElement('div');
+                        meta.style.display = 'flex';
+                        meta.style.gap = '12px';
+                        meta.style.alignItems = 'center';
+
                         const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
+                        thumb.className = 'thumb-small';
                         thumb.src = item.thumbnail || 'https://cdn-icons-png.flaticon.com/512/3767/3767084.png';
                         thumb.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3767/3767084.png'; };
-                        card.appendChild(thumb);
 
-                        // Name
-                        const name = document.createElement('span');
-                        name.textContent = item.folder_name || item.name || item.Title || item.title || 'Folder';
-                        card.appendChild(name);
+                        const info = document.createElement('div');
+                        info.style.display = 'flex';
+                        info.style.flexDirection = 'column';
+                        info.style.gap = '6px';
 
-                        // Arrow
-                        const arrow = document.createElement('span');
-                        arrow.className = 'folder-arrow';
+                        const name = document.createElement('div');
+                        name.style.fontWeight = '700';
+                        name.textContent = item.folder_name || item.Title || item.name || 'Folder';
+
+                        const sub = document.createElement('div');
+                        sub.style.color = '#6b7280';
+                        sub.style.fontSize = '13px';
+                        sub.textContent = `${item.videos_count || 0} videos • ${item.files_count || 0} files`;
+
+                        info.appendChild(name);
+                        info.appendChild(sub);
+
+                        meta.appendChild(thumb);
+                        meta.appendChild(info);
+
+                        const arrow = document.createElement('div');
+                        arrow.style.marginLeft = 'auto';
+                        arrow.innerHTML = '<span style="font-weight:700;color:var(--accent)">Open</span>';
+
+                        card.appendChild(meta);
                         card.appendChild(arrow);
 
                         card.onclick = function() {
                             if (pushHistory) historyStack.push({ courseId, parentId });
-                            // drill into folder using item.id (or fallback parent_id)
                             loadFolderContents(courseId, item.id || item.parent_id || item.parent || -1);
                             document.getElementById('backBtn').style.display = 'inline-block';
                         };
@@ -235,33 +338,54 @@
                         const card = document.createElement('div');
                         card.className = 'file-card';
 
+                        const top = document.createElement('div');
+                        top.className = 'file-top';
+
                         const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
+                        thumb.className = 'video-thumb';
                         thumb.src = item.thumbnail || 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
                         thumb.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/337/337946.png'; };
-                        card.appendChild(thumb);
 
-                        const name = document.createElement('span');
+                        const meta = document.createElement('div');
+                        meta.className = 'meta';
+
+                        const name = document.createElement('div');
+                        name.className = 'title';
                         name.textContent = item.Title || item.title || item.name || 'PDF';
-                        card.appendChild(name);
 
-                        card.onclick = function() {
-                            // The code keeps previous sentinel + decrypt behaviour
-                            if (item.pdf_link === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==" ||
-                                item.pdf_link2 === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==") {
-                                showSadPopup("Sorry, we can't fetch your notes.");
-                            } else if (item.pdf_link) {
-                                const url = decryptCustom(item.pdf_link);
-                                if (url) window.open(url, '_blank');
-                                else showSadPopup("Sorry, we can't fetch your notes.");
-                            } else if (item.pdf_link2) {
-                                const url = decryptCustom(item.pdf_link2);
-                                if (url) window.open(url, '_blank');
-                                else showSadPopup("Sorry, we can't fetch your notes.");
-                            } else {
-                                showSadPopup("Sorry, we can't fetch your notes.");
-                            }
+                        const desc = document.createElement('div');
+                        desc.className = 'desc';
+                        desc.textContent = item.date_and_time || item.event_date || '';
+
+                        const bottomMeta = document.createElement('div');
+                        bottomMeta.className = 'meta-bottom';
+                        const badge = document.createElement('div');
+                        badge.className = 'badge';
+                        badge.textContent = 'PDF';
+                        bottomMeta.appendChild(badge);
+
+                        meta.appendChild(name);
+                        meta.appendChild(desc);
+                        meta.appendChild(bottomMeta);
+
+                        top.appendChild(thumb);
+                        top.appendChild(meta);
+
+                        const actions = document.createElement('div');
+                        actions.className = 'actions-row';
+
+                        const btnPdf = document.createElement('button');
+                        btnPdf.className = 'btn btn-pdf';
+                        btnPdf.textContent = 'Open PDF';
+                        btnPdf.onclick = function(e) {
+                            e.stopPropagation();
+                            openPdfFromItem(item);
                         };
+
+                        actions.appendChild(btnPdf);
+
+                        card.appendChild(top);
+                        card.appendChild(actions);
 
                         folderList.appendChild(card);
                         return;
@@ -272,14 +396,16 @@
                         const card = document.createElement('div');
                         card.className = 'file-card';
 
-                        const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
-                        thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
-                        thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
+                        const img = document.createElement('img');
+                        img.className = 'video-thumb';
+                        img.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
+                        img.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
 
-                        const name = document.createElement('span');
+                        const name = document.createElement('div');
+                        name.className = 'title';
                         name.textContent = item.Title || item.title || item.name || 'Image';
+
+                        card.appendChild(img);
                         card.appendChild(name);
 
                         card.onclick = function() {
@@ -295,58 +421,142 @@
                         const card = document.createElement('div');
                         card.className = 'file-card';
 
+                        const top = document.createElement('div');
+                        top.className = 'file-top';
+
                         const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
+                        thumb.className = 'video-thumb';
                         thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
                         thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
 
-                        const name = document.createElement('span');
+                        const meta = document.createElement('div');
+                        meta.className = 'meta';
+
+                        const name = document.createElement('div');
+                        name.className = 'title';
                         name.textContent = item.Title || item.title || item.name || 'Link';
-                        card.appendChild(name);
 
-                        card.onclick = function() {
-                            if (item.file_link === "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==") {
-                                showSadPopup("Sorry, we can't fetch your notes.");
-                            } else if (item.file_link) {
-                                const url = decryptCustom(item.file_link);
-                                if (url) window.open(url, '_blank');
-                                else showSadPopup("Sorry, we can't fetch this link.");
-                            }
+                        const desc = document.createElement('div');
+                        desc.className = 'desc';
+                        desc.textContent = item.event_date || '';
+
+                        meta.appendChild(name);
+                        meta.appendChild(desc);
+
+                        top.appendChild(thumb);
+                        top.appendChild(meta);
+
+                        const actions = document.createElement('div');
+                        actions.className = 'actions-row';
+
+                        const btnOpen = document.createElement('button');
+                        btnOpen.className = 'btn btn-links';
+                        btnOpen.textContent = 'Open Link';
+                        btnOpen.onclick = function(e) {
+                            e.stopPropagation();
+                            openLinkFromItem(item);
                         };
+
+                        actions.appendChild(btnOpen);
+
+                        card.appendChild(top);
+                        card.appendChild(actions);
 
                         folderList.appendChild(card);
                         return;
                     }
 
-                    // VIDEO
+                    // VIDEO — show bigger thumb + two buttons (Class Links & PDF)
                     if (item.material_type === 'VIDEO' || item.video_id) {
                         const card = document.createElement('div');
                         card.className = 'file-card';
 
+                        const top = document.createElement('div');
+                        top.className = 'file-top';
+
                         const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
+                        thumb.className = 'video-thumb';
                         thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
                         thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
 
-                        const name = document.createElement('span');
+                        const meta = document.createElement('div');
+                        meta.className = 'meta';
+
+                        const name = document.createElement('div');
+                        name.className = 'title';
                         name.textContent = item.Title || item.title || item.name || 'Video';
-                        card.appendChild(name);
 
+                        const desc = document.createElement('div');
+                        desc.className = 'desc';
+                        desc.textContent = `${item.duration || ''} ${item.date_and_time ? '• ' + item.date_and_time : ''}`;
+
+                        const bottomMeta = document.createElement('div');
+                        bottomMeta.className = 'meta-bottom';
+
+                        const badge = document.createElement('div');
+                        badge.className = 'badge';
+                        badge.textContent = 'Video';
+
+                        const videosCount = document.createElement('div');
+                        videosCount.style.color = '#6b7280';
+                        videosCount.style.fontSize = '13px';
+                        videosCount.textContent = item.free_flag ? (String(item.free_flag)==='1' ? 'Free' : '') : '';
+
+                        bottomMeta.appendChild(badge);
+                        if (videosCount.textContent) bottomMeta.appendChild(videosCount);
+
+                        meta.appendChild(name);
+                        meta.appendChild(desc);
+                        meta.appendChild(bottomMeta);
+
+                        top.appendChild(thumb);
+                        top.appendChild(meta);
+
+                        const actions = document.createElement('div');
+                        actions.className = 'actions-row';
+
+                        // Class Links button -> redirect to class-links.html
+                        const btnLinks = document.createElement('button');
+                        btnLinks.className = 'btn btn-links';
+                        btnLinks.textContent = 'Class Links';
+                        btnLinks.onclick = function(e) {
+                            e.stopPropagation();
+                            // build redirect similar to previous pattern but to class-links.html
+                            const appId = getQueryParam("app_id") || "";
+                            const vidParam = encodeURIComponent(item.id || item.video_id || "");
+                            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
+                            const courseParam = encodeURIComponent(getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId') || "");
+                            let redirectUrl = `class-links.html?courseId=${courseParam}&videoId=${vidParam}&ytflag=${ytflag}&folder_wise_course=1`;
+                            if (appId) redirectUrl += `&app_id=${encodeURIComponent(appId)}`;
+                            window.location.href = redirectUrl;
+                        };
+
+                        actions.appendChild(btnLinks);
+
+                        // PDF button (decrypt + open)
+                        if (item.pdf_link || item.pdf_link2 || item.study_material_link) {
+                            const btnPdf = document.createElement('button');
+                            btnPdf.className = 'btn btn-pdf';
+                            btnPdf.textContent = 'PDF';
+                            btnPdf.onclick = function(e) {
+                                e.stopPropagation();
+                                openPdfFromItem(item);
+                            };
+                            actions.appendChild(btnPdf);
+                        }
+
+                        card.appendChild(top);
+                        card.appendChild(actions);
+
+                        // clicking card goes to class-links as well (same as previous video-links redirect behavior)
                         card.onclick = function() {
-                            if (item.video_id) {
-                                const vid = decryptCustom(item.video_id);
-                                if (vid) {
-                                    window.open(`https://www.youtube.com/watch?v=${vid}`, '_blank');
-                                } else {
-                                    showSadPopup("Sorry, we can't fetch this video.");
-                                }
-                            } else {
-                                // Open video-links.html with videoid and folder_wise_course=1
-                                const appId = getQueryParam("app_id");
-                                window.location.href = `video-links.html?app_id=${appId}&videoid=${encodeURIComponent(item.id || item.video_id)}&folder_wise_course=1`;
-                            }
+                            const appId = getQueryParam("app_id") || "";
+                            const vidParam = encodeURIComponent(item.id || item.video_id || "");
+                            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
+                            const courseParam = encodeURIComponent(getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId') || "");
+                            let redirectUrl = `class-links.html?courseId=${courseParam}&videoId=${vidParam}&ytflag=${ytflag}&folder_wise_course=1`;
+                            if (appId) redirectUrl += `&app_id=${encodeURIComponent(appId)}`;
+                            window.location.href = redirectUrl;
                         };
 
                         folderList.appendChild(card);
@@ -359,20 +569,25 @@
                         card.className = 'file-card';
 
                         const thumb = document.createElement('img');
-                        thumb.className = 'thumb';
+                        thumb.className = 'video-thumb';
                         thumb.src = item.thumbnail ? item.thumbnail : 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg';
                         thumb.onerror = function() { this.src = 'https://i.postimg.cc/x1M0YN5Z/sunny.jpg'; };
-                        card.appendChild(thumb);
 
-                        const name = document.createElement('span');
+                        const name = document.createElement('div');
+                        name.className = 'title';
                         name.textContent = item.Title || item.title || item.name || 'File';
+
+                        const desc = document.createElement('div');
+                        desc.className = 'desc';
+                        desc.textContent = item.event_date || '';
+
+                        card.appendChild(thumb);
                         card.appendChild(name);
+                        card.appendChild(desc);
 
                         card.onclick = function() {
                             if (item.file_url || item.file_link) {
-                                // open direct link (if encrypted this won't decrypt unless item.file_link is encrypted and matches decrypt pattern)
                                 const link = item.file_url || item.file_link;
-                                // try decrypt, fallback to raw
                                 const d = decryptCustom(link);
                                 window.open(d || link, '_blank');
                             }
@@ -385,26 +600,49 @@
             } catch (err) {
                 console.error(err);
                 folderList.innerHTML = 'Failed to load folders/files.';
+                empty.style.display = 'block';
+                empty.textContent = 'Failed to load folders/files.';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // accept either 'courseid' or 'course_id' in query params
-            const courseId = getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId');
-            if (!courseId) {
-                document.getElementById('folderList').textContent = 'Course ID missing in URL.';
+        // open external link (decrypt if needed)
+        function openLinkFromItem(item) {
+            const raw = item.file_link || item.file_url;
+            if (!raw) { showSadPopup("Sorry, we can't fetch this link."); return; }
+            const sentinel = "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==";
+            if (raw === sentinel) { showSadPopup("Sorry, we can't fetch this link."); return; }
+            const url = decryptCustom(raw) || raw;
+            if (url) window.open(url, '_blank');
+            else showSadPopup("Sorry, we can't fetch this link.");
+        }
+
+        // PDF handler: tries study_material_link, pdf_link, pdf_link2 then file_link/file_url
+        function openPdfFromItem(item) {
+            const sentinel = "6JaMPbY1Wn6AVb5u6uhyiBiomWEZo4qFvj6t7Um+HV4=:ZmVkY2JhOTg3NjU0MzIxMA==";
+            const candidates = [];
+            if (item.study_material_link) candidates.push(item.study_material_link);
+            if (item.pdf_link) candidates.push(item.pdf_link);
+            if (item.pdf_link2) candidates.push(item.pdf_link2);
+            if (item.file_link) candidates.push(item.file_link);
+            if (item.file_url) candidates.push(item.file_url);
+
+            const filtered = candidates.filter(c => c && String(c) !== sentinel);
+            if (filtered.length === 0) {
+                showSadPopup("Sorry, we can't fetch your notes.");
                 return;
             }
-            loadFolderContents(courseId, -1);
 
-            document.getElementById('backBtn').onclick = function() {
-                if (historyStack.length > 0) {
-                    const prev = historyStack.pop();
-                    loadFolderContents(prev.courseId, prev.parentId, false);
-                    if (historyStack.length === 0) this.style.display = 'none';
-                }
-            };
-        });
+            for (let raw of filtered) {
+                const dec = decryptCustom(raw);
+                const use = dec || raw;
+                if (!use) continue;
+                if (String(use) === sentinel) continue;
+                window.open(use, '_blank');
+                return;
+            }
+
+            showSadPopup("Sorry, we can't fetch your notes.");
+        }
 
         // Sad popup (unchanged)
         function showSadPopup(msg) {
@@ -470,6 +708,26 @@
             popupBg.appendChild(popup);
             document.body.appendChild(popupBg);
         }
+
+        // init
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseId = getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId');
+            if (!courseId) {
+                document.getElementById('folderList').textContent = '';
+                document.getElementById('empty').style.display = 'block';
+                document.getElementById('empty').textContent = 'Course ID missing in URL.';
+                return;
+            }
+            loadFolderContents(courseId, -1);
+
+            document.getElementById('backBtn').onclick = function() {
+                if (historyStack.length > 0) {
+                    const prev = historyStack.pop();
+                    loadFolderContents(prev.courseId, prev.parentId, false);
+                    if (historyStack.length === 0) this.style.display = 'none';
+                }
+            };
+        });
     </script>
 </body>
 </html>
