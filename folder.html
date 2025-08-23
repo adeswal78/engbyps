@@ -230,36 +230,24 @@
             return url.searchParams.get(name);
         }
 
-        // Decrypt function (same as your Python/previous logic)
+        // Keep existing decryption logic unchanged (uses same key/iv as your code)
         function decryptCustom(enc) {
-    if (!enc) return "";
-    try {
-        const parts = enc.split(':');
-        const b64 = parts[0];
-        const key = CryptoJS.enc.Utf8.parse('638udh3829162018');
-        const iv = CryptoJS.enc.Utf8.parse('fedcba9876543210');
-        const encrypted = CryptoJS.enc.Base64.parse(b64);
-        const decrypted = CryptoJS.AES.decrypt(
-            { ciphertext: encrypted },
-            key,
-            { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
-        );
-        let result = decrypted.toString(CryptoJS.enc.Utf8);
-
-        // अगर AES से proper url नहीं मिला तो दूसरा हिस्सा decode करके try करो
-        if ((!result || !result.startsWith("http")) && parts.length > 1) {
+            if (!enc) return "";
             try {
-                result = atob(parts[1]);
+                const b64 = enc.split(':')[0];
+                const key = CryptoJS.enc.Utf8.parse('638udh3829162018');
+                const iv = CryptoJS.enc.Utf8.parse('fedcba9876543210');
+                const encrypted = CryptoJS.enc.Base64.parse(b64);
+                const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+                return decrypted.toString(CryptoJS.enc.Utf8);
             } catch (e) {
-                result = "";
+                return "";
             }
-        }
-
-        return result;
-    } catch (e) {
-        return "";
-    }
-        }
+                    }
 
         let historyStack = [];
 
