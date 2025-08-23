@@ -202,11 +202,62 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
 
+        /* MODALS */
+        .modal-bg {
+            position:fixed;
+            inset:0;
+            background: rgba(0,0,0,0.6);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:10000;
+            padding:20px;
+        }
+
+        .modal {
+            width:100%;
+            max-width:1000px;
+            background:#fff;
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:0 8px 40px rgba(0,0,0,0.4);
+        }
+
+        .modal .modal-header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:10px 14px;
+            background:linear-gradient(90deg,#f3f4f6,#fff);
+            border-bottom:1px solid rgba(0,0,0,0.06);
+        }
+
+        .modal .modal-body {
+            padding:0;
+        }
+
+        .close-modal {
+            background:#d7263d;
+            color:#fff;
+            border:none;
+            width:36px;
+            height:36px;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:700;
+        }
+
+        iframe.pdf-frame { width:100%; height:75vh; border:0; display:block; }
+
         @media(max-width:800px){
             .file-top { flex-direction:column; align-items:stretch; }
             .video-thumb { width:100%; height:160px; }
+            .modal { max-width: 95vw; }
         }
     </style>
+
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
 </head>
 <body>
     <div class="container">
@@ -221,10 +272,41 @@
         <div id="empty" class="empty" style="display:none">No folders/files found.</div>
     </div>
 
+    <!-- Video Modal -->
+    <div id="playerModal" style="display:none" class="modal-bg" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div id="playerTitle" style="font-weight:700;color:#111">Video</div>
+                <button id="closePlayer" class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <video id="player" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="420">
+                    <!-- source will be set dynamically -->
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div id="pdfModal" style="display:none" class="modal-bg" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div id="pdfTitle" style="font-weight:700;color:#111">PDF</div>
+                <button id="closePdf" class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="pdfFrame" class="pdf-frame" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- CryptoJS for decrypt (existing logic retained) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <!-- Video.js -->
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 
     <script>
+        /* ---------- helper utils ---------- */
         function getQueryParam(name) {
             const url = new URL(window.location.href);
             return url.searchParams.get(name);
@@ -247,10 +329,89 @@
             } catch (e) {
                 return "";
             }
+        }
+
+        // recursively search object for first string containing '.m3u8'
+        function findFirstM3U8(obj) {
+            if (!obj) return null;
+            if (typeof obj === 'string') {
+                if (obj.indexOf('.m3u8') !== -1) return obj;
+                return null;
+            }
+            if (Array.isArray(obj)) {
+                for (const it of obj) {
+                    const found = findFirstM3U8(it);
+                    if (found) return found;
+                }
+                return null;
+            }
+            if (typeof obj === 'object') {
+                for (const k in obj) {
+                    try {
+                        const found = findFirstM3U8(obj[k]);
+                        if (found) return found;
+                    } catch(e){}
+                }
+            }
+            return null;
+        }
+
+        // try decrypting common encrypted-looking strings (colon + base64)
+        function tryDecryptCandidates(val) {
+            if (!val) return null;
+            // if it's obviously encrypted (contains ':' and '=')
+            if (String(val).includes(':') && String(val).includes('=')) {
+                const dec = decryptCustom(val);
+                if (dec) return dec;
+            }
+            return null;
+        }
+
+        // deep-scan JSON and decrypted variants for an m3u8
+        function extractM3U8FromJson(json) {
+            // 1. direct search
+            let found = findFirstM3U8(json);
+            if (found) return found;
+
+            // 2. try decrypting string fields and search their parsed result
+            function deepScan(o) {
+                if (!o) return null;
+                if (typeof o === 'string') {
+                    const dec = tryDecryptCandidates(o);
+                    if (dec) {
+                        if (dec.indexOf('.m3u8') !== -1) return dec;
+                        // maybe dec is JSON
+                        try {
+                            const parsed = JSON.parse(dec);
+                            const f = findFirstM3U8(parsed);
+                            if (f) return f;
+                        } catch(e){}
                     }
+                    return null;
+                }
+                if (Array.isArray(o)) {
+                    for (const it of o) {
+                        const r = deepScan(it);
+                        if (r) return r;
+                    }
+                    return null;
+                }
+                if (typeof o === 'object') {
+                    for (const k in o) {
+                        const r = deepScan(o[k]);
+                        if (r) return r;
+                    }
+                }
+                return null;
+            }
+            return deepScan(json);
+        }
 
+        /* ---------- UI state ---------- */
         let historyStack = [];
+        let playerInstance = null;
 
+        /* ---------- Core: load folder contents ---------- */
         async function loadFolderContents(courseId, parentId = -1, pushHistory = true) {
             const folderList = document.getElementById('folderList');
             const empty = document.getElementById('empty');
@@ -264,7 +425,7 @@
 
                 folderList.innerHTML = '';
 
-                const items = Array.isArray(json.data) ? json.data : [];
+                const items = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
                 if (items.length === 0) {
                     folderList.textContent = '';
                     empty.style.display = 'block';
@@ -332,7 +493,7 @@
                     }
 
                     // PDF
-                    if (item.material_type === 'PDF') {
+                    if (item.material_type === 'PDF' || item.pdf_link || item.study_material_link || item.pdf_link2) {
                         const card = document.createElement('div');
                         card.className = 'file-card';
 
@@ -464,8 +625,8 @@
                         return;
                     }
 
-                    // VIDEO — show bigger thumb + two buttons (Class Links & PDF)
-                    if (item.material_type === 'VIDEO' || item.video_id) {
+                    // VIDEO — show bigger thumb + two buttons (Play & PDF if available)
+                    if (item.material_type === 'VIDEO' || item.video_id || item.id) {
                         const card = document.createElement('div');
                         card.className = 'file-card';
 
@@ -513,26 +674,18 @@
                         const actions = document.createElement('div');
                         actions.className = 'actions-row';
 
-                        // Class Links button -> redirect to class-links.html
-                        const btnLinks = document.createElement('button');
-                        btnLinks.className = 'btn btn-links';
-                        btnLinks.textContent = 'Class Links';
-                        btnLinks.onclick = function(e) {
+                        // Play button -> try to play inline
+                        const btnPlay = document.createElement('button');
+                        btnPlay.className = 'btn btn-links';
+                        btnPlay.textContent = 'Play';
+                        btnPlay.onclick = function(e) {
                             e.stopPropagation();
-                            // build redirect similar to previous pattern but to class-links.html
-                            const appId = getQueryParam("app_id") || "";
-                            const vidParam = encodeURIComponent(item.id || item.video_id || "");
-                            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
-                            const courseParam = encodeURIComponent(getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId') || "");
-                            let redirectUrl = `class-links.html?courseId=${courseParam}&videoId=${vidParam}&ytflag=${ytflag}&folder_wise_course=1`;
-                            if (appId) redirectUrl += `&app_id=${encodeURIComponent(appId)}`;
-                            window.location.href = redirectUrl;
+                            playVideoFromItem(item);
                         };
-
-                        actions.appendChild(btnLinks);
+                        actions.appendChild(btnPlay);
 
                         // PDF button (decrypt + open)
-                        if (item.pdf_link || item.pdf_link2 || item.study_material_link) {
+                        if (item.pdf_link || item.pdf_link2 || item.study_material_link || item.file_link || item.file_url) {
                             const btnPdf = document.createElement('button');
                             btnPdf.className = 'btn btn-pdf';
                             btnPdf.textContent = 'PDF';
@@ -546,15 +699,9 @@
                         card.appendChild(top);
                         card.appendChild(actions);
 
-                        // clicking card goes to class-links as well (same as previous video-links redirect behavior)
+                        // clicking card goes to play as well
                         card.onclick = function() {
-                            const appId = getQueryParam("app_id") || "";
-                            const vidParam = encodeURIComponent(item.id || item.video_id || "");
-                            const ytflag = encodeURIComponent(item.ytFlagWeb ?? item.ytFlag ?? 0);
-                            const courseParam = encodeURIComponent(getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId') || "");
-                            let redirectUrl = `class-links.html?courseId=${courseParam}&videoId=${vidParam}&ytflag=${ytflag}&folder_wise_course=1`;
-                            if (appId) redirectUrl += `&app_id=${encodeURIComponent(appId)}`;
-                            window.location.href = redirectUrl;
+                            playVideoFromItem(item);
                         };
 
                         folderList.appendChild(card);
@@ -603,6 +750,147 @@
             }
         }
 
+        /* ---------- Video play flow ---------- */
+        // get a usable video URL (m3u8 or mp4) from item
+        async function resolveVideoUrlFromItem(item) {
+            // try direct candidates
+            const candidates = [
+                item.download_link, item.download_links, item.file_url, item.file_link,
+                item.video_url, item.video_source, item.path, item.path_enc
+            ];
+
+            // if any candidate is an array, flatten
+            const flat = [];
+            for (const c of candidates) {
+                if (!c) continue;
+                if (Array.isArray(c)) {
+                    c.forEach(x => flat.push(x));
+                } else {
+                    flat.push(c);
+                }
+            }
+
+            // 1) check direct strings (and decrypted variants)
+            for (const c of flat) {
+                try {
+                    if (typeof c === 'string') {
+                        // try decrypt if looks encrypted
+                        const dec = tryDecryptCandidates(c) || c;
+                        if (typeof dec === 'string' && dec.indexOf('.m3u8') !== -1) return dec;
+                    } else if (typeof c === 'object') {
+                        // object may have path fields
+                        const f = findFirstM3U8(c);
+                        if (f) return f;
+                    }
+                } catch(e){}
+            }
+
+            // 2) fallback: call fetchVideoDetailsById via proxy to get more info
+            try {
+                const courseParam = encodeURIComponent(getQueryParam('courseid') || getQueryParam('course_id') || getQueryParam('courseId') || item.course_id || item.courseId || '');
+                const vidParam = encodeURIComponent(item.id || item.video_id || item.videoId || item.asset_id || '');
+                if (!vidParam) return null;
+                const apiUrl = `https://adeswal-eng.onrender.com/api/get/fetchVideoDetailsById?course_id=${courseParam}&video_id=${vidParam}&ytflag=0&folder_wise_course=1`;
+                const res = await fetch(apiUrl);
+                if (!res.ok) return null;
+                const j = await res.json();
+                // some responses put data inside j.data
+                const payload = j.data ? j.data : j;
+                // try find direct m3u8
+                let found = extractM3U8FromJson(payload);
+                if (found) return found;
+
+                // also try known fields like download_links array
+                if (payload.download_links && Array.isArray(payload.download_links)) {
+                    for (const dl of payload.download_links) {
+                        // dl.path might be encrypted; decrypt and test
+                        if (dl.path) {
+                            const dec = tryDecryptCandidates(dl.path) || dl.path;
+                            if (dec && dec.indexOf('.m3u8') !== -1) return dec;
+                        }
+                        // maybe dl.url
+                        if (dl.url && String(dl.url).indexOf('.m3u8') !== -1) return dl.url;
+                    }
+                }
+
+                // some APIs return download_link as single field
+                if (payload.download_link) {
+                    const dec = tryDecryptCandidates(payload.download_link) || payload.download_link;
+                    if (dec && dec.indexOf('.m3u8') !== -1) return dec;
+                }
+            } catch(e){
+                console.warn("fetchVideoDetailsById failed:", e);
+            }
+
+            return null;
+        }
+
+        async function playVideoFromItem(item) {
+            try {
+                // show loading title
+                document.getElementById('playerTitle').textContent = item.Title || item.title || 'Video';
+                // resolve URL
+                const url = await resolveVideoUrlFromItem(item);
+                if (!url) {
+                    showSadPopup("Couldn't find playable video for this item.");
+                    return;
+                }
+
+                // show modal
+                const modal = document.getElementById('playerModal');
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+
+                // init player if not exists
+                if (!playerInstance) {
+                    playerInstance = videojs('player', {
+                        controls: true,
+                        autoplay: false,
+                        preload: 'auto'
+                    });
+                }
+
+                // set source and play
+                try {
+                    playerInstance.pause();
+                    playerInstance.src({ src: url, type: url.indexOf('.m3u8') !== -1 ? 'application/x-mpegURL' : 'video/mp4' });
+                    // attempt autoplay; user gesture rules may prevent autoplay with sound
+                    playerInstance.ready(() => {
+                        playerInstance.play().catch(()=>{ /* ignore autoplay rejected */ });
+                    });
+                } catch (e) {
+                    console.error("player set src error", e);
+                    showSadPopup("Unable to start playback.");
+                }
+            } catch (err) {
+                console.error(err);
+                showSadPopup("Error while trying to play video.");
+            }
+        }
+
+        // close player modal
+        document.addEventListener('DOMContentLoaded', function(){
+            document.getElementById('closePlayer').onclick = function() {
+                const modal = document.getElementById('playerModal');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                try {
+                    if (playerInstance) {
+                        playerInstance.pause();
+                        playerInstance.src('');
+                    }
+                } catch(e){}
+            };
+
+            document.getElementById('closePdf').onclick = function() {
+                const modal = document.getElementById('pdfModal');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                document.getElementById('pdfFrame').src = '';
+            };
+        });
+
+        /* ---------- Link & PDF open flow ---------- */
         // open external link (decrypt if needed)
         function openLinkFromItem(item) {
             const raw = item.file_link || item.file_url;
@@ -635,8 +923,27 @@
                 const use = dec || raw;
                 if (!use) continue;
                 if (String(use) === sentinel) continue;
-                window.open(use, '_blank');
-                return;
+                // open in modal (prefer pdf viewer endpoint if needed)
+                try {
+                    const pdfFrame = document.getElementById('pdfFrame');
+                    // if the URL already points to a PDF viewer or pdfjs, use directly
+                    if (use.indexOf('viewer.html') !== -1 || use.toLowerCase().endsWith('.pdf')) {
+                        pdfFrame.src = use;
+                    } else {
+                        // try to pass to pdfjs viewer if hosted locally; otherwise just open the file directly in iframe
+                        // adjust path if your pdf viewer is at pdfjs/web/viewer.html
+                        pdfFrame.src = `https://adeswal-eng.onrender.com/pdfjs/web/viewer.html?file=${encodeURIComponent(use)}`;
+                    }
+                    document.getElementById('pdfTitle').textContent = item.Title || item.title || 'PDF';
+                    const modal = document.getElementById('pdfModal');
+                    modal.style.display = 'flex';
+                    modal.setAttribute('aria-hidden', 'false');
+                    return;
+                } catch(e){
+                    // fallback open new tab
+                    window.open(use, '_blank');
+                    return;
+                }
             }
 
             showSadPopup("Sorry, we can't fetch your notes.");
